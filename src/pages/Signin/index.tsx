@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {View, Button, StyleSheet} from 'react-native';
-import {signIn} from '../../services/auth';
+
+import AuthContext from '../../contexts/auth';
 
 const styles = StyleSheet.create({
   container: {
@@ -9,11 +10,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-const Signin: React.FC = () => {
-  async function handleSignIn() {
-    const response = await signIn();
 
-    console.log(response);
+const Signin: React.FC = () => {
+  const {signed, signIn} = useContext(AuthContext);
+
+  console.log(signed);
+
+  function handleSignIn() {
+    signIn();
   }
 
   return (
