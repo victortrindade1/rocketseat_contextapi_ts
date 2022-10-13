@@ -41,24 +41,24 @@ export default App;
 +
 +interface AuthContextData {
 +  signed: boolean;
-+  user: object;
++  user: object | null;
 +  signIn(): Promise<void>;
 +}
 
 -const AuthContext = createContext({signed: true});
 +const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-+export const AuthProvider: React.FC<IAuthProvider> = ({
-+  children,
-+}: IAuthProvider) => {
++export const AuthProvider: React.FC<IAuthProvider> = ({children}) => {
++  const [user, setUser] = useState<object | null>(null);
+
 +  async function signIn() {
 +    const response = await auth.signIn();
 +
-+    console.log(response);
++    setUser(response.user);
 +  }
 +
 +  return (
-+    <AuthContext.Provider value={{signed: false, user: {}, signIn}}>
++    <AuthContext.Provider value={{signed: !!user, user: {}, signIn}}>
 +      {children}
 +    </AuthContext.Provider>
 +  );
@@ -85,9 +85,10 @@ const styles = StyleSheet.create({
 
 const Signin: React.FC = () => {
 -  const {signed} = useContext(AuthContext);
-+  const {signed, signIn} = useContext(AuthContext);
++  const {signed, signIn, user} = useContext(AuthContext);
 
   console.log(signed);
++  console.log(user);
 
 -  async function handleSignIn() {
 -    const response = await signIn();
@@ -106,4 +107,52 @@ const Signin: React.FC = () => {
 };
 
 export default Signin;
+```
+
+## src/services/auth.ts
+
+```diff
++interface Response {
++  token: string;
++  user: {
++    name: string;
++    email: string;
++  };
++}
+
+-export function signIn() {
++export function signIn(): Promise<Response> {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        token: 'hbsefkenlfweinjfhwfjwergnkefweflwemrglne534veg54tgbt54',
+        user: {
+          name: 'Victor',
+          email: 'victortrin@gmail.com',
+        },
+      });
+    }, 2000);
+  });
+}
+```
+
+## src/routes/index.tsx
+
+```diff
+-import React from 'react';
++import React, {useContext} from 'react';
+
++import AuthContext from '../contexts/auth';
+
+import AuthRoutes from './auth.routes';
++import AppRoutes from './app.routes';
+
+const Routes: React.FC = () => {
++  const {signed} = useContext(AuthContext);
+
+-  return <AuthRoutes />;
++  return signed ? <AppRoutes /> : <AuthRoutes />;
+};
+
+export default Routes;
 ```

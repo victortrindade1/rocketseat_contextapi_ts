@@ -7,14 +7,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
 const Signin: React.FC = () => {
-  const {signed, signIn} = useContext(AuthContext);
+  const {signed, signIn, user} = useContext(AuthContext);
 
   console.log(signed);
+  console.log(user);
 
   function handleSignIn() {
     signIn();
