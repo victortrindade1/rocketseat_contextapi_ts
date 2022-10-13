@@ -1,8 +1,29 @@
+# Enviar o token nas requests
+
+Instale o axios.
+
+`yarn add axios`
+
+## src/services/api.ts
+
+```ts
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3333',
+});
+
+export default api;
+```
+
+## src/contexts/auth.tsx
+
+```diff
 import React, {createContext, useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import * as auth from '../services/auth';
-import api from '../services/api';
++import api from '../services/api';
 
 interface IAuthProvider {
   children: React.ReactNode;
@@ -32,7 +53,7 @@ export const AuthProvider: React.FC<IAuthProvider> = ({children}) => {
         setUser(JSON.parse(storagedUser));
         setLoading(false);
 
-        api.defaults.headers.common.Authorization = `Bearer ${storagedToken}`;
++        api.defaults.headers.common.Authorization = `Bearer ${storagedToken}`;
       }
     }
 
@@ -44,18 +65,13 @@ export const AuthProvider: React.FC<IAuthProvider> = ({children}) => {
 
     setUser(response.user);
 
-    api.defaults.headers.common.Authorization = `Bearer ${response.token}`;
++    api.defaults.headers.common.Authorization = `Bearer ${response.token}`;
 
     await AsyncStorage.setItem('@RNAuth:user', JSON.stringify(response.user));
     await AsyncStorage.setItem('@RNAuth:token', response.token);
   }
 
   function signOut() {
-    // É o mesmo q:
-    /**
-     * await AsyncStorage.clear();
-     * setUser(null)
-     */
     AsyncStorage.clear().then(() => setUser(null));
   }
 
@@ -68,3 +84,4 @@ export const AuthProvider: React.FC<IAuthProvider> = ({children}) => {
 };
 
 export default AuthContext;
+```
